@@ -9,6 +9,9 @@ sqlalchemy = "*"
 pipenv = "*"
 requests = "*"
 "voiceit2" = "*"
+passlib = "*"
+flask-httpauth = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 "flake8" = "*"

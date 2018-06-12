@@ -266,11 +266,9 @@ input:checked+.slider:before {
     height: 49px;
 }
 
-
 .voice-recorder:hover {
     opacity: 0.8;
 }
-
 
 .rec-btn {
     cursor: pointer;
@@ -289,11 +287,11 @@ ul {
 }
 
 /* The message box is shown when the user clicks on the password field */
+
 #message {
     display: block;
     color: #000;
     position: relative;
-
     margin: 10px 0;
 }
 
@@ -304,6 +302,7 @@ ul {
 }
 
 /* Add a green text color and a checkmark when the requirements are right */
+
 .valid {
     color: green;
 }
@@ -315,6 +314,7 @@ ul {
 }
 
 /* Add a red text color and an "x" icon when the requirements are wrong */
+
 .invalid {
     color: red;
 }
@@ -323,4 +323,11 @@ ul {
     position: relative;
     left: -12px;
     content: "✖";
+}
+
+label[name="errormsg"] {
+    font-style: italic;
+    margin: 10px 0;
+    color: red;
+    font-size: 1.1rem;
 }

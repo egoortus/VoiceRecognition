@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    let [registration, login] = document.forms
+    let psw1 = document.getElementById("psw1");
+    let psw2 = document.getElementById("psw2");
+    let message = document.getElementById("message");
+
     function closeModal(event) {
         // Get the modal
         var modal2 = document.getElementById('id02');
@@ -38,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return is_valid
     }
 
-    function recordVoice() {
+    function recordVoice(element, audio, key) {
+        element.parentNode.style = 'background-image: url(/recording.gif);color: transparent;'
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
                 const mediaRecorder = new MediaRecorder(stream);
@@ -50,27 +56,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 mediaRecorder.addEventListener('stop', () => {
-                    login.record = new Blob(audioChunks, { type: 'audio/wav' });
+                    audio[key] = new Blob(audioChunks, { type: 'audio/wav' });
                 });
 
                 setTimeout(() => {
                     mediaRecorder.stop();
-                    login.elements.rec.parentNode.style = null
-                    login.elements.rec.checked = true;
+                    element.parentNode.style = null
+                    element.checked = true;
                 }, 3050);
             });
     }
-
-    window.onclick = closeModal
-
-    let psw1 = document.getElementById("psw1");
-    let psw2 = document.getElementById("psw2");
-    let message = document.getElementById("message");
-    psw1.onfocus = psw2.onfocus = () => { message.style.display = "block"; }
-    psw1.onblur = psw2.onblur = () => { message.style.display = "none"; }
-    psw1.onkeyup = psw2.onkeyup = () => { checkPassword(psw1, psw2) }
-
-    let [registration, login] = document.forms
+    
+    registration.onsubmit = event => {
+        event.preventDefault()
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', `/registration/${registration.elements.uname.value}`);
+        xhr.send(login.elements.usepsw.checked ? login.elements.psw.value : login.record);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState != 4) return;
+            if (xhr.status == 403 && xhr.status == 404) {
+                login.elements.rec.checked = false
+                login.record = null
+                login.elements.errormsg.innerText = xhr.statusText
+            } else {
+                document.innerHTML = xhr.response
+                window.history.pushState({}, login.elements.uname.value, login.elements.uname.value)
+            }
+        }
+    }
 
     login.onsubmit = event => {
         event.preventDefault()
@@ -79,37 +92,25 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send(login.elements.usepsw.checked ? login.elements.psw.value : login.record);
         xhr.onreadystatechange = function () {
             if (xhr.readyState != 4) return;
-
-            if (xhr.status != 200) {
-                alert(xhr.status + ': ' + xhr.statusText);
+            if (xhr.status == 403 && xhr.status == 404) {
+                login.elements.rec.checked = false
+                login.record = null
+                login.elements.errormsg.innerText = xhr.statusText
             } else {
-                console.log('Готово!');
+                document.innerHTML = xhr.response
+                window.history.pushState({}, login.elements.uname.value, login.elements.uname.value)
             }
         }
     }
 
-    login.elements.rec.onclick = () => {
-        login.elements.rec.parentNode.style = 'background-image: url(/recording.gif);color: transparent;'
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                const mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.start();
 
-                const audioChunks = [];
-                mediaRecorder.addEventListener("dataavailable", event => {
-                    audioChunks.push(event.data);
-                });
-
-                mediaRecorder.addEventListener('stop', () => {
-                    login.record = new Blob(audioChunks, { type: 'audio/wav' });
-                });
-
-                setTimeout(() => {
-                    mediaRecorder.stop();
-                    login.elements.rec.parentNode.style = null
-                    login.elements.rec.checked = true;
-                }, 3050);
-            });
-    }
-
+    window.onclick = closeModal
+    window.onpopstate = () => { window.location = ''}
+    psw1.onfocus = psw2.onfocus = () => { message.style.display = "block"; }
+    psw1.onblur = psw2.onblur = () => { message.style.display = "none"; }
+    psw1.onkeyup = psw2.onkeyup = () => { checkPassword(psw1, psw2) }
+    login.elements.rec.onclick = () => { recordVoice(login.elements.rec, login, 'record') }
+    registration.elements.rec1.onclick = () => { recordVoice(registration.elements.rec1, registration, 'record1') }
+    registration.elements.rec2.onclick = () => { recordVoice(registration.elements.rec2, registration, 'record2') }
+    registration.elements.rec3.onclick = () => { recordVoice(registration.elements.rec3, registration, 'record3') }
 });
