@@ -21,24 +21,53 @@
 
             <div class="container">
                 <h1>Sign Up</h1>
-                <p>Please fill in this form to create an account.</p>
+
                 <label for="email">
                     <b>Username</b>
                 </label>
                 <input type="text" placeholder="Enter username" name="uname" required>
-
+                
                 <label for="psw">
                     <b>Password</b>
                 </label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
-
+                <input id="psw1" type="password" placeholder="Enter Password" name="psw" required>
+                
                 <label for="psw-repeat">
                     <b>Repeat Password</b>
                 </label>
-                <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
-
+                <input id="psw2" type="password" placeholder="Repeat Password" name="psw-repeat" required>
+                
+                
+                <div id="message">
+                    <b>Password must contain the following:</b>
+                    <p id="letter" class="invalid">A
+                        <b>lowercase</b> letter</p>
+                    <p id="capital" class="invalid">A
+                        <b>capital (uppercase)</b> letter</p>
+                    <p id="number" class="invalid">A
+                        <b>number</b>
+                    </p>
+                    <p id="length" class="invalid">Minimum
+                        <b>8 characters</b>
+                    </p>
+                    <p id="match" class="invalid">Passwords are
+                        <b>match</b>
+                    </p>
+                </div>
+                
+                <div class="phrases">
+                    <b>Please say one of this phrases 3 times</b>
+                    <ul style="padding-left: 25px; margin-top: 5px;">
+                        <li>zoos are filled with small and large animals</li>
+                        <li>remember to wash your hands before eating</li>
+                        <li>never forget tomorrow is a new day</li>
+                        <li>today is a nice day to go for a walk</li>
+                        <li>my face and voice identify me</li>
+                    </ul>
+                </div>
+                
                 <div class="voice-recorder" style="background-color: #fd2919;">Record 1
-                    <input class='rec-btn' type="checkbox" name="rec1"required>
+                    <input class='rec-btn' type="checkbox" name="rec1" required>
                 </div>
                 <div class="voice-recorder" style="background-color: #fd2919;">Record 2
                     <input class='rec-btn' type="checkbox" name="rec2" required>
@@ -46,10 +75,10 @@
                 <div class="voice-recorder" style="background-color: #fd2919;">Record 3
                     <input class='rec-btn' type="checkbox" name="rec3" required>
                 </div>
-
+                
                 <p>By creating an account you agree to our
                     <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p>
-
+                    
                 <div class="clearfix">
                     <button type="button" onclick="closeModal()" class="cancelbtn">Cancel</button>
                     <button type="submit" class="signupbtn">Sign Up</button>
@@ -57,33 +86,33 @@
             </div>
         </form>
     </div>
-
+    
     <div id="id02" class="modal">
-
+        
         <form class="modal-content animate">
-
+            
             <div class="container">
                 <h1>Login</h1>
                 <label for="uname">
                     <b>Username</b>
                 </label>
                 <input type="text" placeholder="Enter Username" name="uname" required>
-
-
+                
+                
                 <div class="voice-recorder" style="background-color: #fd2919;">Record
                     <input class="rec-btn" type="checkbox" name="rec" required>
                 </div>
-
+                
                 <label class="switch">
                     <input type="checkbox" name="usepsw" onchange="if (!this.checked) document.getElementById('password-block').style.height = '0', document.getElementById('psw').required = false, document.getElementsByName('rec')[0].required = true; else document.getElementById('password-block').style.height = '57px', document.getElementById('psw').required = true, document.getElementsByName('rec')[0].required = false">
                     <span class="slider"></span>
                 </label>
                 <label class="sign">Use password</label>
-
+                
                 <div id="password-block" style="height: 0px;">
                     <input type="password" placeholder="Enter Password" name="psw" id="psw">
                 </div>
-
+                
                 <div class="clearfix">
                     <button type="button" onclick="closeModal()" class="cancelbtn">Cancel</button>
                     <button type="submit" class="signupbtn">Login</button>
