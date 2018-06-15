@@ -22,7 +22,7 @@ input[type=text], input[type=password] {
 
 /* Set a style for all buttons */
 
-button {
+input[type='button'], input[type='submit'], button {
     background-color: #1aa020;
     color: white;
     padding: 14px 20px;
@@ -34,7 +34,7 @@ button {
     font-size: 18px;
 }
 
-button:hover {
+input[type='button']:hover, input[type='submit']:hover, button:hover {
     opacity: 0.8;
 }
 
@@ -324,10 +324,11 @@ ul {
     left: -12px;
     content: "✖";
 }
-
-label[name="errormsg"] {
+input[readonly].errormsg {
     font-style: italic;
-    margin: 10px 0;
+    padding: 0;
+    margin: 0;
+    border: none;
     color: red;
-    font-size: 1.1rem;
+    font-size: 18px;
 }

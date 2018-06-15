@@ -1,37 +1,34 @@
-document.addEventListener('DOMContentLoaded', () => {
-    let [registration, login] = document.forms
-    let psw1 = document.getElementById("psw1");
-    let psw2 = document.getElementById("psw2");
-    let message = document.getElementById("message");
+function closeModal(event) {
+    var modal2 = document.getElementById('id02');
+    var modal1 = document.getElementById('id01');
 
-    function closeModal(event) {
-        // Get the modal
-        var modal2 = document.getElementById('id02');
-        // Get the modal
-        var modal1 = document.getElementById('id01');
-
-        if (!event || event.target == document.getElementById('id01') || event.target == document.getElementById('id02')) {
-            modal1.style.display = "none";
-            modal2.style.display = "none";
-        }
+    if (!event || event.target == document.getElementById('id01') || event.target == document.getElementById('id02')) {
+        modal1.style.display = 'none';
+        modal2.style.display = 'none';
     }
+}
+
+
+function setup() {
+    let token, username, voice_count = 0;
+    let registration, login, changepsw, voice, user;
 
     function checkPassword(psw1, psw2) {
-        let letter = document.getElementById("letter");
-        let capital = document.getElementById("capital");
-        let number = document.getElementById("number");
-        let length = document.getElementById("length");
-        let match = document.getElementById("match");
+        let letter = document.getElementById('letter');
+        let capital = document.getElementById('capital');
+        let number = document.getElementById('number');
+        let length = document.getElementById('length');
+        let match = document.getElementById('match');
         let is_valid = true
 
         invalid_to_valid = errortype => {
-            errortype.classList.add("valid");
-            errortype.classList.remove("invalid");
+            errortype.classList.add('valid');
+            errortype.classList.remove('invalid');
         }
         valid_to_invalid = errortype => {
             is_valid = false;
-            errortype.classList.add("invalid");
-            errortype.classList.remove("valid");
+            errortype.classList.add('invalid');
+            errortype.classList.remove('valid');
         }
 
         psw1.value.match(/[a-z]/g) ? invalid_to_valid(letter) : valid_to_invalid(letter);
@@ -43,15 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return is_valid
     }
 
-    function recordVoice(element, audio, key) {
-        element.parentNode.style = 'background-image: url(/recording.gif);color: transparent;'
+    function recordVoice(audio, key, before, after) {
+        before()
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
                 const mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.start();
 
                 const audioChunks = [];
-                mediaRecorder.addEventListener("dataavailable", event => {
+                mediaRecorder.addEventListener('dataavailable', event => {
                     audioChunks.push(event.data);
                 });
 
@@ -59,58 +56,123 @@ document.addEventListener('DOMContentLoaded', () => {
                     audio[key] = new Blob(audioChunks, { type: 'audio/wav' });
                 });
 
-                setTimeout(() => {
-                    mediaRecorder.stop();
-                    element.parentNode.style = null
-                    element.checked = true;
-                }, 3050);
+                setTimeout(() => { mediaRecorder.stop(), after() }, 4000);
             });
     }
-    
-    registration.onsubmit = event => {
-        event.preventDefault()
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', `/registration/${registration.elements.uname.value}`);
-        xhr.send(login.elements.usepsw.checked ? login.elements.psw.value : login.record);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState != 4) return;
-            if (xhr.status == 403 && xhr.status == 404) {
-                login.elements.rec.checked = false
-                login.record = null
-                login.elements.errormsg.innerText = xhr.statusText
-            } else {
-                document.innerHTML = xhr.response
-                window.history.pushState({}, login.elements.uname.value, login.elements.uname.value)
+
+    function loadUserPage() {
+        closeModal()
+        settins = document.getElementById('id03').style.display = 'block';
+    }
+
+    if (registration = document.forms.registration) {
+        registration.elements.psw1.onkeyup = registration.elements.psw2.onkeyup =
+            () => { checkPassword(registration.elements.psw1, registration.elements.psw2) }
+
+        registration.onsubmit = event => {
+            event.preventDefault()
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/registration');
+            xhr.setRequestHeader('Content-Type', 'application/json')
+            xhr.send(JSON.stringify({ 'username': registration.elements.uname.value, 'password': registration.elements.psw2.value }));
+            xhr.onloadend = function () {
+                if (xhr.status == 201) {
+                    token = JSON.parse(xhr.response).token
+                    username = registration.elements.uname.value
+                    registration.reset()
+                    loadUserPage()
+                }
+                else if (xhr.status == 403 && xhr.status == 404) {
+                    login.elements.rec.checked = false
+                    login.record = null
+                    login.elements.errormsg.value = xhr.statusText
+                } else {
+                    console.log(xht.response)
+                }
             }
         }
     }
 
-    login.onsubmit = event => {
-        event.preventDefault()
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', `/login/${login.elements.uname.value}`);
-        xhr.send(login.elements.usepsw.checked ? login.elements.psw.value : login.record);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState != 4) return;
-            if (xhr.status == 403 && xhr.status == 404) {
-                login.elements.rec.checked = false
-                login.record = null
-                login.elements.errormsg.innerText = xhr.statusText
+    if (login = document.forms.login) {
+        login.elements.rec.onclick = () => {
+            recordVoice(login, 'record',
+                () => {
+                    login.elements.rec.parentNode.style = 'background-image: url(/recording.gif);color: transparent;'
+                },
+                () => {
+                    login.elements.rec.parentNode.style = null;
+                    login.elements.rec.checked = true
+                }
+            )
+        }
+
+        login.onsubmit = event => {
+            event.preventDefault()
+            var xhr = new XMLHttpRequest();
+            if (login.elements.usepsw.checked) {
+                xhr.open('POST', `/api/login-psw`);
+                xhr.setRequestHeader('Authorization', 'Basic ' + btoa(`${login.elements.uname.value}:${login.elements.psw.value}`));
+                xhr.send();
             } else {
-                document.innerHTML = xhr.response
-                window.history.pushState({}, login.elements.uname.value, login.elements.uname.value)
+                xhr.open('POST', `/api/login-rec/${login.elements.uname.value}`);
+                xhr.send(login.record);
+            }
+            xhr.onloadend = () => {
+                if (xhr.status == 401 || xhr.status == 404) {
+                    login.elements.rec.checked = false
+                    login.record = null
+                    login.elements.errormsg.value = 'Incorrect username or password'
+                } else if (xhr.status == 200) {
+                    username = login.elements.uname.value;
+                    token = JSON.parse(xhr.response).token;
+                    loadUserPage();
+                }
             }
         }
+    }
+
+    if (voice = document.forms.voice) {
+        voice.elements.rec.onclick = () => {
+            recordVoice(voice, 'record',
+                () => {
+                    voice.elements.rec.style.backgroundImage = 'url(/recording.gif)'
+                },
+                () => {
+                    voice.elements.rec.style.backgroundImage = null
+                }
+            )
+        }
+
+        voice.onsubmit = event => {
+            event.preventDefault()
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', `/api/voice`);
+            xhr.setRequestHeader('Authorization', 'Basic ' + btoa(`${token}:unused`));
+            xhr.send(voice.record);
+            xhr.onloadend = () => {
+                if (xhr.status != 201) {
+                    voice.elements.errormsg.value = 'Phrase not added!'
+                } else {
+                    voice.elements.errormsg.value = xhr.responseText
+                }
+            }
+        }
+    }
+
+    document.forms.user.elements.delete.onclick = () => {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', `/api/remove`);
+        xhr.setRequestHeader('Authorization', 'Basic ' + btoa(`${token}:unused`));
+        xhr.send(voice.record);
+        xhr.onloadend = () => { window.location = '/' }
+    }
+
+    document.forms.user.elements.exit.onclick = window.onpopstate = () => {
+        window.location = '/'
     }
 
 
     window.onclick = closeModal
-    window.onpopstate = () => { window.location = ''}
-    psw1.onfocus = psw2.onfocus = () => { message.style.display = "block"; }
-    psw1.onblur = psw2.onblur = () => { message.style.display = "none"; }
-    psw1.onkeyup = psw2.onkeyup = () => { checkPassword(psw1, psw2) }
-    login.elements.rec.onclick = () => { recordVoice(login.elements.rec, login, 'record') }
-    registration.elements.rec1.onclick = () => { recordVoice(registration.elements.rec1, registration, 'record1') }
-    registration.elements.rec2.onclick = () => { recordVoice(registration.elements.rec2, registration, 'record2') }
-    registration.elements.rec3.onclick = () => { recordVoice(registration.elements.rec3, registration, 'record3') }
-});
+}
+
+document.addEventListener('DOMContentLoaded', setup)

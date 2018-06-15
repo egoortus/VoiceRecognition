@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta encoding="ISO-8859-1">
+    <title>Voice authentification service</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="/main.js"></script>
+</head>
+
+<body>
+
+    <h1>Welcome {{user.username}}</h1>
+
+    <div id="id01" class="modal" style="display: block">
+        <div class="modal-content animate">
+
+            <div class="container">
+                <h1>Settings</h1>
+
+                <form name="changepsw">
+                    <label for="psw1">
+                        <b>Change password password</b>
+                    </label>
+                    <input id="psw1" type="password" placeholder="Old password" name="psw1" required>
+                    <input id="psw2" type="password" placeholder="New password" name="psw2" required>
+                    <input id="psw3" type="password" placeholder="Repeat password" name="psw3" required>
+
+
+                    <div id="message" style="margin: 0px;">
+                        <label>Password must contain the following:</label>
+                        <p id="letter" class="invalid">A
+                            <b>lowercase</b> letter</p>
+                        <p id="capital" class="invalid">A
+                            <b>capital (uppercase)</b> letter</p>
+                        <p id="number" class="invalid">A
+                            <b>number</b>
+                        </p>
+                        <p id="length" class="invalid">Minimum
+                            <b>8 characters</b>
+                        </p>
+                        <p id="match" class="invalid">Passwords are
+                            <b>match</b>
+                        </p>
+                    </div>
+                    <input type="button" name="changepsw" value="Change password">
+                </form>
+                <form name="voice">
+                    <div class="phrases" style="margin: 10px 0;">
+                        <b>Please say one of this phrases 3 times</b>
+                        <ul style="padding-left: 25px; margin-top: 5px;">
+                            <li>zoos are filled with small and large animals</li>
+                            <li>remember to wash your hands before eating</li>
+                            <li>never forget tomorrow is a new day</li>
+                            <li>today is a nice day to go for a walk</li>
+                            <li>my face and voice identify me</li>
+                        </ul>
+                        <div>
+                            <input type="button" name="rec" value="Voice record" style="width: calc(70% - 5px)">
+                            <input type="submit" value="Send" style="width: 30%">
+                            <input class="errormsg" name="errormsg" type="text" readonly>
+                        </div>
+                    </div>
+                </form>
+                <form name='user'>
+                    <input type="button" name="delete" style="background-color: #fd2919" value="Delete account">
+                    <input type="button" name="exit" style="background-color: #fd2919" value="Exit">
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
